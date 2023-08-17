@@ -11,7 +11,7 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-generator zodtypes {
+generator zod {
   provider = "pnpx zod-prisma-types"
   output   = "../src/lib/schemas/generated/"
 }

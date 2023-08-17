@@ -15,9 +15,9 @@
 
 <script lang="ts">
 	import { createHoverCard, melt } from '@melt-ui/svelte'
-	import { Trigger, Content } from './'
+	import { Trigger, Content } from '.'
 
-	const hoverCard = createHoverCard({
+		const hoverCard = createHoverCard({
 		openDelay: 350
 	})
 

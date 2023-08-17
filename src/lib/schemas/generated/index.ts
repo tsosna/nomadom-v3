@@ -10,17 +10,19 @@ import type { Prisma } from '@prisma/client';
 // ENUMS
 /////////////////////////////////////////
 
-export const ElevationScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','name','imgId']);
-
-export const ImgScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','hash','url','alt','caption']);
+export const TransactionIsolationLevelSchema = z.enum(['ReadUncommitted','ReadCommitted','RepeatableRead','Serializable']);
 
 export const ProjectScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','slug','path','name','icon','imgId']);
 
-export const QueryModeSchema = z.enum(['default','insensitive']);
+export const ImgScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','hash','url','alt','caption']);
+
+export const ElevationScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','name','imgId']);
 
 export const SortOrderSchema = z.enum(['asc','desc']);
 
-export const TransactionIsolationLevelSchema = z.enum(['ReadUncommitted','ReadCommitted','RepeatableRead','Serializable']);
+export const QueryModeSchema = z.enum(['default','insensitive']);
+
+export const NullsOrderSchema = z.enum(['first','last']);
 /////////////////////////////////////////
 // MODELS
 /////////////////////////////////////////
@@ -173,16 +175,53 @@ export const ProjectOrderByWithRelationInputSchema: z.ZodType<Prisma.ProjectOrde
   slug: z.lazy(() => SortOrderSchema).optional(),
   path: z.lazy(() => SortOrderSchema).optional(),
   name: z.lazy(() => SortOrderSchema).optional(),
-  icon: z.lazy(() => SortOrderSchema).optional(),
+  icon: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   imgId: z.lazy(() => SortOrderSchema).optional(),
   img: z.lazy(() => ImgOrderByWithRelationInputSchema).optional()
 }).strict();
 
-export const ProjectWhereUniqueInputSchema: z.ZodType<Prisma.ProjectWhereUniqueInput> = z.object({
+export const ProjectWhereUniqueInputSchema: z.ZodType<Prisma.ProjectWhereUniqueInput> = z.union([
+  z.object({
+    id: z.number().int(),
+    slug: z.string(),
+    imgId: z.number().int()
+  }),
+  z.object({
+    id: z.number().int(),
+    slug: z.string(),
+  }),
+  z.object({
+    id: z.number().int(),
+    imgId: z.number().int(),
+  }),
+  z.object({
+    id: z.number().int(),
+  }),
+  z.object({
+    slug: z.string(),
+    imgId: z.number().int(),
+  }),
+  z.object({
+    slug: z.string(),
+  }),
+  z.object({
+    imgId: z.number().int(),
+  }),
+])
+.and(z.object({
   id: z.number().int().optional(),
   slug: z.string().optional(),
-  imgId: z.number().int().optional()
-}).strict();
+  imgId: z.number().int().optional(),
+  AND: z.union([ z.lazy(() => ProjectWhereInputSchema),z.lazy(() => ProjectWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => ProjectWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => ProjectWhereInputSchema),z.lazy(() => ProjectWhereInputSchema).array() ]).optional(),
+  createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  path: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  name: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  icon: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  img: z.union([ z.lazy(() => ImgRelationFilterSchema),z.lazy(() => ImgWhereInputSchema) ]).optional(),
+}).strict());
 
 export const ProjectOrderByWithAggregationInputSchema: z.ZodType<Prisma.ProjectOrderByWithAggregationInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
@@ -191,7 +230,7 @@ export const ProjectOrderByWithAggregationInputSchema: z.ZodType<Prisma.ProjectO
   slug: z.lazy(() => SortOrderSchema).optional(),
   path: z.lazy(() => SortOrderSchema).optional(),
   name: z.lazy(() => SortOrderSchema).optional(),
-  icon: z.lazy(() => SortOrderSchema).optional(),
+  icon: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   imgId: z.lazy(() => SortOrderSchema).optional(),
   _count: z.lazy(() => ProjectCountOrderByAggregateInputSchema).optional(),
   _avg: z.lazy(() => ProjectAvgOrderByAggregateInputSchema).optional(),
@@ -225,8 +264,8 @@ export const ImgWhereInputSchema: z.ZodType<Prisma.ImgWhereInput> = z.object({
   url: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   alt: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   caption: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
-  project: z.union([ z.lazy(() => ProjectRelationFilterSchema),z.lazy(() => ProjectWhereInputSchema) ]).optional().nullable(),
-  elevation: z.union([ z.lazy(() => ElevationRelationFilterSchema),z.lazy(() => ElevationWhereInputSchema) ]).optional().nullable(),
+  project: z.union([ z.lazy(() => ProjectNullableRelationFilterSchema),z.lazy(() => ProjectWhereInputSchema) ]).optional().nullable(),
+  elevation: z.union([ z.lazy(() => ElevationNullableRelationFilterSchema),z.lazy(() => ElevationWhereInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const ImgOrderByWithRelationInputSchema: z.ZodType<Prisma.ImgOrderByWithRelationInput> = z.object({
@@ -235,17 +274,54 @@ export const ImgOrderByWithRelationInputSchema: z.ZodType<Prisma.ImgOrderByWithR
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   hash: z.lazy(() => SortOrderSchema).optional(),
   url: z.lazy(() => SortOrderSchema).optional(),
-  alt: z.lazy(() => SortOrderSchema).optional(),
-  caption: z.lazy(() => SortOrderSchema).optional(),
+  alt: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  caption: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   project: z.lazy(() => ProjectOrderByWithRelationInputSchema).optional(),
   elevation: z.lazy(() => ElevationOrderByWithRelationInputSchema).optional()
 }).strict();
 
-export const ImgWhereUniqueInputSchema: z.ZodType<Prisma.ImgWhereUniqueInput> = z.object({
+export const ImgWhereUniqueInputSchema: z.ZodType<Prisma.ImgWhereUniqueInput> = z.union([
+  z.object({
+    id: z.number().int(),
+    hash: z.string(),
+    url: z.string()
+  }),
+  z.object({
+    id: z.number().int(),
+    hash: z.string(),
+  }),
+  z.object({
+    id: z.number().int(),
+    url: z.string(),
+  }),
+  z.object({
+    id: z.number().int(),
+  }),
+  z.object({
+    hash: z.string(),
+    url: z.string(),
+  }),
+  z.object({
+    hash: z.string(),
+  }),
+  z.object({
+    url: z.string(),
+  }),
+])
+.and(z.object({
   id: z.number().int().optional(),
   hash: z.string().optional(),
-  url: z.string().optional()
-}).strict();
+  url: z.string().optional(),
+  AND: z.union([ z.lazy(() => ImgWhereInputSchema),z.lazy(() => ImgWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => ImgWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => ImgWhereInputSchema),z.lazy(() => ImgWhereInputSchema).array() ]).optional(),
+  createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  alt: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  caption: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  project: z.union([ z.lazy(() => ProjectNullableRelationFilterSchema),z.lazy(() => ProjectWhereInputSchema) ]).optional().nullable(),
+  elevation: z.union([ z.lazy(() => ElevationNullableRelationFilterSchema),z.lazy(() => ElevationWhereInputSchema) ]).optional().nullable(),
+}).strict());
 
 export const ImgOrderByWithAggregationInputSchema: z.ZodType<Prisma.ImgOrderByWithAggregationInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
@@ -253,8 +329,8 @@ export const ImgOrderByWithAggregationInputSchema: z.ZodType<Prisma.ImgOrderByWi
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   hash: z.lazy(() => SortOrderSchema).optional(),
   url: z.lazy(() => SortOrderSchema).optional(),
-  alt: z.lazy(() => SortOrderSchema).optional(),
-  caption: z.lazy(() => SortOrderSchema).optional(),
+  alt: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  caption: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   _count: z.lazy(() => ImgCountOrderByAggregateInputSchema).optional(),
   _avg: z.lazy(() => ImgAvgOrderByAggregateInputSchema).optional(),
   _max: z.lazy(() => ImgMaxOrderByAggregateInputSchema).optional(),
@@ -296,10 +372,29 @@ export const ElevationOrderByWithRelationInputSchema: z.ZodType<Prisma.Elevation
   img: z.lazy(() => ImgOrderByWithRelationInputSchema).optional()
 }).strict();
 
-export const ElevationWhereUniqueInputSchema: z.ZodType<Prisma.ElevationWhereUniqueInput> = z.object({
+export const ElevationWhereUniqueInputSchema: z.ZodType<Prisma.ElevationWhereUniqueInput> = z.union([
+  z.object({
+    id: z.number().int(),
+    imgId: z.number().int()
+  }),
+  z.object({
+    id: z.number().int(),
+  }),
+  z.object({
+    imgId: z.number().int(),
+  }),
+])
+.and(z.object({
   id: z.number().int().optional(),
-  imgId: z.number().int().optional()
-}).strict();
+  imgId: z.number().int().optional(),
+  AND: z.union([ z.lazy(() => ElevationWhereInputSchema),z.lazy(() => ElevationWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => ElevationWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => ElevationWhereInputSchema),z.lazy(() => ElevationWhereInputSchema).array() ]).optional(),
+  createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  name: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  img: z.union([ z.lazy(() => ImgRelationFilterSchema),z.lazy(() => ImgWhereInputSchema) ]).optional(),
+}).strict());
 
 export const ElevationOrderByWithAggregationInputSchema: z.ZodType<Prisma.ElevationOrderByWithAggregationInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
@@ -582,6 +677,11 @@ export const ImgRelationFilterSchema: z.ZodType<Prisma.ImgRelationFilter> = z.ob
   isNot: z.lazy(() => ImgWhereInputSchema).optional()
 }).strict();
 
+export const SortOrderInputSchema: z.ZodType<Prisma.SortOrderInput> = z.object({
+  sort: z.lazy(() => SortOrderSchema),
+  nulls: z.lazy(() => NullsOrderSchema).optional()
+}).strict();
+
 export const ProjectCountOrderByAggregateInputSchema: z.ZodType<Prisma.ProjectCountOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
@@ -691,12 +791,12 @@ export const StringNullableWithAggregatesFilterSchema: z.ZodType<Prisma.StringNu
   _max: z.lazy(() => NestedStringNullableFilterSchema).optional()
 }).strict();
 
-export const ProjectRelationFilterSchema: z.ZodType<Prisma.ProjectRelationFilter> = z.object({
+export const ProjectNullableRelationFilterSchema: z.ZodType<Prisma.ProjectNullableRelationFilter> = z.object({
   is: z.lazy(() => ProjectWhereInputSchema).optional().nullable(),
   isNot: z.lazy(() => ProjectWhereInputSchema).optional().nullable()
 }).strict();
 
-export const ElevationRelationFilterSchema: z.ZodType<Prisma.ElevationRelationFilter> = z.object({
+export const ElevationNullableRelationFilterSchema: z.ZodType<Prisma.ElevationNullableRelationFilter> = z.object({
   is: z.lazy(() => ElevationWhereInputSchema).optional().nullable(),
   isNot: z.lazy(() => ElevationWhereInputSchema).optional().nullable()
 }).strict();
@@ -796,7 +896,7 @@ export const ImgUpdateOneRequiredWithoutProjectNestedInputSchema: z.ZodType<Pris
   connectOrCreate: z.lazy(() => ImgCreateOrConnectWithoutProjectInputSchema).optional(),
   upsert: z.lazy(() => ImgUpsertWithoutProjectInputSchema).optional(),
   connect: z.lazy(() => ImgWhereUniqueInputSchema).optional(),
-  update: z.union([ z.lazy(() => ImgUpdateWithoutProjectInputSchema),z.lazy(() => ImgUncheckedUpdateWithoutProjectInputSchema) ]).optional(),
+  update: z.union([ z.lazy(() => ImgUpdateToOneWithWhereWithoutProjectInputSchema),z.lazy(() => ImgUpdateWithoutProjectInputSchema),z.lazy(() => ImgUncheckedUpdateWithoutProjectInputSchema) ]).optional(),
 }).strict();
 
 export const IntFieldUpdateOperationsInputSchema: z.ZodType<Prisma.IntFieldUpdateOperationsInput> = z.object({
@@ -835,40 +935,40 @@ export const ProjectUpdateOneWithoutImgNestedInputSchema: z.ZodType<Prisma.Proje
   create: z.union([ z.lazy(() => ProjectCreateWithoutImgInputSchema),z.lazy(() => ProjectUncheckedCreateWithoutImgInputSchema) ]).optional(),
   connectOrCreate: z.lazy(() => ProjectCreateOrConnectWithoutImgInputSchema).optional(),
   upsert: z.lazy(() => ProjectUpsertWithoutImgInputSchema).optional(),
-  disconnect: z.boolean().optional(),
-  delete: z.boolean().optional(),
+  disconnect: z.union([ z.boolean(),z.lazy(() => ProjectWhereInputSchema) ]).optional(),
+  delete: z.union([ z.boolean(),z.lazy(() => ProjectWhereInputSchema) ]).optional(),
   connect: z.lazy(() => ProjectWhereUniqueInputSchema).optional(),
-  update: z.union([ z.lazy(() => ProjectUpdateWithoutImgInputSchema),z.lazy(() => ProjectUncheckedUpdateWithoutImgInputSchema) ]).optional(),
+  update: z.union([ z.lazy(() => ProjectUpdateToOneWithWhereWithoutImgInputSchema),z.lazy(() => ProjectUpdateWithoutImgInputSchema),z.lazy(() => ProjectUncheckedUpdateWithoutImgInputSchema) ]).optional(),
 }).strict();
 
 export const ElevationUpdateOneWithoutImgNestedInputSchema: z.ZodType<Prisma.ElevationUpdateOneWithoutImgNestedInput> = z.object({
   create: z.union([ z.lazy(() => ElevationCreateWithoutImgInputSchema),z.lazy(() => ElevationUncheckedCreateWithoutImgInputSchema) ]).optional(),
   connectOrCreate: z.lazy(() => ElevationCreateOrConnectWithoutImgInputSchema).optional(),
   upsert: z.lazy(() => ElevationUpsertWithoutImgInputSchema).optional(),
-  disconnect: z.boolean().optional(),
-  delete: z.boolean().optional(),
+  disconnect: z.union([ z.boolean(),z.lazy(() => ElevationWhereInputSchema) ]).optional(),
+  delete: z.union([ z.boolean(),z.lazy(() => ElevationWhereInputSchema) ]).optional(),
   connect: z.lazy(() => ElevationWhereUniqueInputSchema).optional(),
-  update: z.union([ z.lazy(() => ElevationUpdateWithoutImgInputSchema),z.lazy(() => ElevationUncheckedUpdateWithoutImgInputSchema) ]).optional(),
+  update: z.union([ z.lazy(() => ElevationUpdateToOneWithWhereWithoutImgInputSchema),z.lazy(() => ElevationUpdateWithoutImgInputSchema),z.lazy(() => ElevationUncheckedUpdateWithoutImgInputSchema) ]).optional(),
 }).strict();
 
 export const ProjectUncheckedUpdateOneWithoutImgNestedInputSchema: z.ZodType<Prisma.ProjectUncheckedUpdateOneWithoutImgNestedInput> = z.object({
   create: z.union([ z.lazy(() => ProjectCreateWithoutImgInputSchema),z.lazy(() => ProjectUncheckedCreateWithoutImgInputSchema) ]).optional(),
   connectOrCreate: z.lazy(() => ProjectCreateOrConnectWithoutImgInputSchema).optional(),
   upsert: z.lazy(() => ProjectUpsertWithoutImgInputSchema).optional(),
-  disconnect: z.boolean().optional(),
-  delete: z.boolean().optional(),
+  disconnect: z.union([ z.boolean(),z.lazy(() => ProjectWhereInputSchema) ]).optional(),
+  delete: z.union([ z.boolean(),z.lazy(() => ProjectWhereInputSchema) ]).optional(),
   connect: z.lazy(() => ProjectWhereUniqueInputSchema).optional(),
-  update: z.union([ z.lazy(() => ProjectUpdateWithoutImgInputSchema),z.lazy(() => ProjectUncheckedUpdateWithoutImgInputSchema) ]).optional(),
+  update: z.union([ z.lazy(() => ProjectUpdateToOneWithWhereWithoutImgInputSchema),z.lazy(() => ProjectUpdateWithoutImgInputSchema),z.lazy(() => ProjectUncheckedUpdateWithoutImgInputSchema) ]).optional(),
 }).strict();
 
 export const ElevationUncheckedUpdateOneWithoutImgNestedInputSchema: z.ZodType<Prisma.ElevationUncheckedUpdateOneWithoutImgNestedInput> = z.object({
   create: z.union([ z.lazy(() => ElevationCreateWithoutImgInputSchema),z.lazy(() => ElevationUncheckedCreateWithoutImgInputSchema) ]).optional(),
   connectOrCreate: z.lazy(() => ElevationCreateOrConnectWithoutImgInputSchema).optional(),
   upsert: z.lazy(() => ElevationUpsertWithoutImgInputSchema).optional(),
-  disconnect: z.boolean().optional(),
-  delete: z.boolean().optional(),
+  disconnect: z.union([ z.boolean(),z.lazy(() => ElevationWhereInputSchema) ]).optional(),
+  delete: z.union([ z.boolean(),z.lazy(() => ElevationWhereInputSchema) ]).optional(),
   connect: z.lazy(() => ElevationWhereUniqueInputSchema).optional(),
-  update: z.union([ z.lazy(() => ElevationUpdateWithoutImgInputSchema),z.lazy(() => ElevationUncheckedUpdateWithoutImgInputSchema) ]).optional(),
+  update: z.union([ z.lazy(() => ElevationUpdateToOneWithWhereWithoutImgInputSchema),z.lazy(() => ElevationUpdateWithoutImgInputSchema),z.lazy(() => ElevationUncheckedUpdateWithoutImgInputSchema) ]).optional(),
 }).strict();
 
 export const ImgCreateNestedOneWithoutElevationInputSchema: z.ZodType<Prisma.ImgCreateNestedOneWithoutElevationInput> = z.object({
@@ -882,7 +982,7 @@ export const ImgUpdateOneRequiredWithoutElevationNestedInputSchema: z.ZodType<Pr
   connectOrCreate: z.lazy(() => ImgCreateOrConnectWithoutElevationInputSchema).optional(),
   upsert: z.lazy(() => ImgUpsertWithoutElevationInputSchema).optional(),
   connect: z.lazy(() => ImgWhereUniqueInputSchema).optional(),
-  update: z.union([ z.lazy(() => ImgUpdateWithoutElevationInputSchema),z.lazy(() => ImgUncheckedUpdateWithoutElevationInputSchema) ]).optional(),
+  update: z.union([ z.lazy(() => ImgUpdateToOneWithWhereWithoutElevationInputSchema),z.lazy(() => ImgUpdateWithoutElevationInputSchema),z.lazy(() => ImgUncheckedUpdateWithoutElevationInputSchema) ]).optional(),
 }).strict();
 
 export const NestedIntFilterSchema: z.ZodType<Prisma.NestedIntFilter> = z.object({
@@ -1050,6 +1150,12 @@ export const ImgCreateOrConnectWithoutProjectInputSchema: z.ZodType<Prisma.ImgCr
 export const ImgUpsertWithoutProjectInputSchema: z.ZodType<Prisma.ImgUpsertWithoutProjectInput> = z.object({
   update: z.union([ z.lazy(() => ImgUpdateWithoutProjectInputSchema),z.lazy(() => ImgUncheckedUpdateWithoutProjectInputSchema) ]),
   create: z.union([ z.lazy(() => ImgCreateWithoutProjectInputSchema),z.lazy(() => ImgUncheckedCreateWithoutProjectInputSchema) ]),
+  where: z.lazy(() => ImgWhereInputSchema).optional()
+}).strict();
+
+export const ImgUpdateToOneWithWhereWithoutProjectInputSchema: z.ZodType<Prisma.ImgUpdateToOneWithWhereWithoutProjectInput> = z.object({
+  where: z.lazy(() => ImgWhereInputSchema).optional(),
+  data: z.union([ z.lazy(() => ImgUpdateWithoutProjectInputSchema),z.lazy(() => ImgUncheckedUpdateWithoutProjectInputSchema) ]),
 }).strict();
 
 export const ImgUpdateWithoutProjectInputSchema: z.ZodType<Prisma.ImgUpdateWithoutProjectInput> = z.object({
@@ -1118,6 +1224,12 @@ export const ElevationCreateOrConnectWithoutImgInputSchema: z.ZodType<Prisma.Ele
 export const ProjectUpsertWithoutImgInputSchema: z.ZodType<Prisma.ProjectUpsertWithoutImgInput> = z.object({
   update: z.union([ z.lazy(() => ProjectUpdateWithoutImgInputSchema),z.lazy(() => ProjectUncheckedUpdateWithoutImgInputSchema) ]),
   create: z.union([ z.lazy(() => ProjectCreateWithoutImgInputSchema),z.lazy(() => ProjectUncheckedCreateWithoutImgInputSchema) ]),
+  where: z.lazy(() => ProjectWhereInputSchema).optional()
+}).strict();
+
+export const ProjectUpdateToOneWithWhereWithoutImgInputSchema: z.ZodType<Prisma.ProjectUpdateToOneWithWhereWithoutImgInput> = z.object({
+  where: z.lazy(() => ProjectWhereInputSchema).optional(),
+  data: z.union([ z.lazy(() => ProjectUpdateWithoutImgInputSchema),z.lazy(() => ProjectUncheckedUpdateWithoutImgInputSchema) ]),
 }).strict();
 
 export const ProjectUpdateWithoutImgInputSchema: z.ZodType<Prisma.ProjectUpdateWithoutImgInput> = z.object({
@@ -1142,6 +1254,12 @@ export const ProjectUncheckedUpdateWithoutImgInputSchema: z.ZodType<Prisma.Proje
 export const ElevationUpsertWithoutImgInputSchema: z.ZodType<Prisma.ElevationUpsertWithoutImgInput> = z.object({
   update: z.union([ z.lazy(() => ElevationUpdateWithoutImgInputSchema),z.lazy(() => ElevationUncheckedUpdateWithoutImgInputSchema) ]),
   create: z.union([ z.lazy(() => ElevationCreateWithoutImgInputSchema),z.lazy(() => ElevationUncheckedCreateWithoutImgInputSchema) ]),
+  where: z.lazy(() => ElevationWhereInputSchema).optional()
+}).strict();
+
+export const ElevationUpdateToOneWithWhereWithoutImgInputSchema: z.ZodType<Prisma.ElevationUpdateToOneWithWhereWithoutImgInput> = z.object({
+  where: z.lazy(() => ElevationWhereInputSchema).optional(),
+  data: z.union([ z.lazy(() => ElevationUpdateWithoutImgInputSchema),z.lazy(() => ElevationUncheckedUpdateWithoutImgInputSchema) ]),
 }).strict();
 
 export const ElevationUpdateWithoutImgInputSchema: z.ZodType<Prisma.ElevationUpdateWithoutImgInput> = z.object({
@@ -1186,6 +1304,12 @@ export const ImgCreateOrConnectWithoutElevationInputSchema: z.ZodType<Prisma.Img
 export const ImgUpsertWithoutElevationInputSchema: z.ZodType<Prisma.ImgUpsertWithoutElevationInput> = z.object({
   update: z.union([ z.lazy(() => ImgUpdateWithoutElevationInputSchema),z.lazy(() => ImgUncheckedUpdateWithoutElevationInputSchema) ]),
   create: z.union([ z.lazy(() => ImgCreateWithoutElevationInputSchema),z.lazy(() => ImgUncheckedCreateWithoutElevationInputSchema) ]),
+  where: z.lazy(() => ImgWhereInputSchema).optional()
+}).strict();
+
+export const ImgUpdateToOneWithWhereWithoutElevationInputSchema: z.ZodType<Prisma.ImgUpdateToOneWithWhereWithoutElevationInput> = z.object({
+  where: z.lazy(() => ImgWhereInputSchema).optional(),
+  data: z.union([ z.lazy(() => ImgUpdateWithoutElevationInputSchema),z.lazy(() => ImgUncheckedUpdateWithoutElevationInputSchema) ]),
 }).strict();
 
 export const ImgUpdateWithoutElevationInputSchema: z.ZodType<Prisma.ImgUpdateWithoutElevationInput> = z.object({
@@ -1221,7 +1345,7 @@ export const ProjectFindFirstArgsSchema: z.ZodType<Prisma.ProjectFindFirstArgs> 
   cursor: ProjectWhereUniqueInputSchema.optional(),
   take: z.number().optional(),
   skip: z.number().optional(),
-  distinct: ProjectScalarFieldEnumSchema.array().optional(),
+  distinct: z.union([ ProjectScalarFieldEnumSchema,ProjectScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
 export const ProjectFindFirstOrThrowArgsSchema: z.ZodType<Prisma.ProjectFindFirstOrThrowArgs> = z.object({
@@ -1232,7 +1356,7 @@ export const ProjectFindFirstOrThrowArgsSchema: z.ZodType<Prisma.ProjectFindFirs
   cursor: ProjectWhereUniqueInputSchema.optional(),
   take: z.number().optional(),
   skip: z.number().optional(),
-  distinct: ProjectScalarFieldEnumSchema.array().optional(),
+  distinct: z.union([ ProjectScalarFieldEnumSchema,ProjectScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
 export const ProjectFindManyArgsSchema: z.ZodType<Prisma.ProjectFindManyArgs> = z.object({
@@ -1243,7 +1367,7 @@ export const ProjectFindManyArgsSchema: z.ZodType<Prisma.ProjectFindManyArgs> = 
   cursor: ProjectWhereUniqueInputSchema.optional(),
   take: z.number().optional(),
   skip: z.number().optional(),
-  distinct: ProjectScalarFieldEnumSchema.array().optional(),
+  distinct: z.union([ ProjectScalarFieldEnumSchema,ProjectScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
 export const ProjectAggregateArgsSchema: z.ZodType<Prisma.ProjectAggregateArgs> = z.object({
@@ -1283,7 +1407,7 @@ export const ImgFindFirstArgsSchema: z.ZodType<Prisma.ImgFindFirstArgs> = z.obje
   cursor: ImgWhereUniqueInputSchema.optional(),
   take: z.number().optional(),
   skip: z.number().optional(),
-  distinct: ImgScalarFieldEnumSchema.array().optional(),
+  distinct: z.union([ ImgScalarFieldEnumSchema,ImgScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
 export const ImgFindFirstOrThrowArgsSchema: z.ZodType<Prisma.ImgFindFirstOrThrowArgs> = z.object({
@@ -1294,7 +1418,7 @@ export const ImgFindFirstOrThrowArgsSchema: z.ZodType<Prisma.ImgFindFirstOrThrow
   cursor: ImgWhereUniqueInputSchema.optional(),
   take: z.number().optional(),
   skip: z.number().optional(),
-  distinct: ImgScalarFieldEnumSchema.array().optional(),
+  distinct: z.union([ ImgScalarFieldEnumSchema,ImgScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
 export const ImgFindManyArgsSchema: z.ZodType<Prisma.ImgFindManyArgs> = z.object({
@@ -1305,7 +1429,7 @@ export const ImgFindManyArgsSchema: z.ZodType<Prisma.ImgFindManyArgs> = z.object
   cursor: ImgWhereUniqueInputSchema.optional(),
   take: z.number().optional(),
   skip: z.number().optional(),
-  distinct: ImgScalarFieldEnumSchema.array().optional(),
+  distinct: z.union([ ImgScalarFieldEnumSchema,ImgScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
 export const ImgAggregateArgsSchema: z.ZodType<Prisma.ImgAggregateArgs> = z.object({
@@ -1345,7 +1469,7 @@ export const ElevationFindFirstArgsSchema: z.ZodType<Prisma.ElevationFindFirstAr
   cursor: ElevationWhereUniqueInputSchema.optional(),
   take: z.number().optional(),
   skip: z.number().optional(),
-  distinct: ElevationScalarFieldEnumSchema.array().optional(),
+  distinct: z.union([ ElevationScalarFieldEnumSchema,ElevationScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
 export const ElevationFindFirstOrThrowArgsSchema: z.ZodType<Prisma.ElevationFindFirstOrThrowArgs> = z.object({
@@ -1356,7 +1480,7 @@ export const ElevationFindFirstOrThrowArgsSchema: z.ZodType<Prisma.ElevationFind
   cursor: ElevationWhereUniqueInputSchema.optional(),
   take: z.number().optional(),
   skip: z.number().optional(),
-  distinct: ElevationScalarFieldEnumSchema.array().optional(),
+  distinct: z.union([ ElevationScalarFieldEnumSchema,ElevationScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
 export const ElevationFindManyArgsSchema: z.ZodType<Prisma.ElevationFindManyArgs> = z.object({
@@ -1367,7 +1491,7 @@ export const ElevationFindManyArgsSchema: z.ZodType<Prisma.ElevationFindManyArgs
   cursor: ElevationWhereUniqueInputSchema.optional(),
   take: z.number().optional(),
   skip: z.number().optional(),
-  distinct: ElevationScalarFieldEnumSchema.array().optional(),
+  distinct: z.union([ ElevationScalarFieldEnumSchema,ElevationScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
 export const ElevationAggregateArgsSchema: z.ZodType<Prisma.ElevationAggregateArgs> = z.object({

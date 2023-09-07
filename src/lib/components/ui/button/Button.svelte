@@ -1,13 +1,11 @@
 <script lang="ts">
 	import type { VariantProps } from 'class-variance-authority'
 	import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements'
-	import {melt} from '@melt-ui/svelte'
 
 	import { cn } from '$lib/utils'
 	import { buttonVariants } from '.'
 
 	import { Icon, Logo} from '$components/ui/icon'
-  const I = {Icon, Logo }
 
 	let className: string | undefined | null = undefined
 	export { className as class }
@@ -51,5 +49,5 @@
 	on:mouseleave
 
 >
-	<slot {I}/>
+	<slot {Icon} {Logo}/>
 </svelte:element>

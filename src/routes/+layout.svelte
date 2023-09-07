@@ -3,10 +3,11 @@
 	import { i } from '@inlang/sdk-js'
 </script>
 
+
 <slot />
 
-<span class="text-xs">
+<footer class="text-xs">
 	&copy <span class="uppercase">{i('company.name')}</span>
 	{new Date().getFullYear()}
-	{i('copyright')}</span
+	{i('copyright')}</footer
 >

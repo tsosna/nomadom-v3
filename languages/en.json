@@ -25,7 +25,14 @@
 		"twitter": "Twitter",
 		"phone": "Phone"
 	},
-	"language": "Language",
+	"language": {
+		"phrase": "Language",
+		"pl": "Polski",
+		"en": "English",
+		"de": "Deutsch",
+		"fr": "Français",
+		"ru": "Русский"
+	},
 	"projects": {
 		"phrase": "Projects",
 		"japonico-35": {

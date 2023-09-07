@@ -1,3 +1,5 @@
+export const prerender = true
+
 import type { ProjectImgTYPE } from '$lib/type'
 
 export const load = async ({fetch}) => {
@@ -5,3 +7,5 @@ export const load = async ({fetch}) => {
   const projects: Array<ProjectImgTYPE> = await response.json()
   return {projects}
 };
+
+

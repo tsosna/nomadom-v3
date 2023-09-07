@@ -15,29 +15,31 @@
 		Trees,
 		Menu,
 		PanelRightOpen,
-		MoreHorizontal
+		MoreHorizontal,
+		Home,
+		Globe
 	} from 'lucide-svelte'
 	import { Logo } from './'
-
-	const I = {
-		Sun,
-		Moon,
-		Mail,
-		Languages,
-		Logo,
-		Facebook,
-		Instagram,
-		Twitter,
-		Phone,
-		Flower,
-		Leaf,
-		Sprout,
-		Shrub,
-		Trees,
-		Menu,
-		PanelRightOpen,
-		MoreHorizontal
-	}
 </script>
 
-<slot {I} />
+<slot
+	{Sun}
+	{Moon}
+	{Mail}
+	{Languages}
+	{Logo}
+	{Facebook}
+	{Instagram}
+	{Twitter}
+	{Phone}
+	{Flower}
+	{Leaf}
+	{Sprout}
+	{Shrub}
+	{Trees}
+	{Menu}
+	{PanelRightOpen}
+	{MoreHorizontal}
+	{Home}
+	{Globe}
+/>

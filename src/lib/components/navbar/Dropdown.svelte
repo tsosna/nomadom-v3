@@ -1,22 +1,30 @@
 <script lang="ts">
-  import {LinkPreview} from '$components/ui/link-preview'
-  import {Button} from '$components/ui/button'
+	import { i } from '@inlang/sdk-js'
+	import { Button } from '$components/ui/button'
 
-  export let title: string
-  export let dropdown: any
+	export let currentItem: number = 0
+	export let item: {
+		icon: string | null
+		name: string
+		slug: string
+		path: string
+		currentItem: number
+	}
+
+	item.icon = null
+
 </script>
 
-
-<LinkPreview let:Trigger>
-  <Trigger>
-    <Button variant="outline" class="gap-2" >{title}</Button>
-  </Trigger>
-
-  <div slot="content" let:Content>
-    <Content class='flex flex-col gap-2 '>
-      
-      
-      <slot name='dropdown'/>
-    </Content>
-  </div>
-</LinkPreview>
+<Button
+	let:Icon
+	href={`${item.path}/${item.slug}`}
+	variant="outline"
+	class="gap-2 border-0"
+	aria-label={item.name}
+	on:mouseenter={() => (currentItem = item.currentItem)}
+>
+	<svelte:component this={Icon[item.icon]} aria-label={i(item.name)} {...$$props} />
+	<span class="text-lg font-light font-manrope">
+		{item.name}
+	</span>
+</Button>

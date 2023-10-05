@@ -12,6 +12,5 @@
 </script>
 
 <div class={cn('flex justify-between items-center text-accent-foreground bg-accent', className)}>
-
 	<slot  {Theme} {Language} {MenuBar} {Button} {Navbar} />
 </div>

@@ -1,19 +1,17 @@
 <script lang="ts">
-	import { i } from '@inlang/sdk-js'
-	import { Button } from '$components/ui/button'
-	import { LinkPreview } from '$components/ui/link-preview/index.js'
-	import { Header } from '$components/header'
+	import { Navbar } from '$components/navbar'
 	export let data
 	const { projects } = data
 </script>
 
-<Header let:Theme let:Language let:Navbar>
-	<Navbar let:Brand>
-		<Brand />
-	</Navbar>
+<Navbar let:Brand let:Menu let:Language let:Theme >
+	<Brand />
 
+	<Menu />
+
+	
 	<div class="flex">
 		<Theme />
 		<Language />
 	</div>
-</Header>
+</Navbar>
